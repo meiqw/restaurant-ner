@@ -1,12 +1,12 @@
 import json
 from typing import Mapping, Sequence, Dict, Optional
 from typing import Iterable, Sequence, Tuple, List, Dict
-import hw3utils
-from hw3utils import FeatureExtractor, ScoringCounts, ScoringEntity, EntityEncoder, PRF1
+import utils
+from utils import FeatureExtractor, ScoringCounts, ScoringEntity, EntityEncoder, PRF1
 import spacy
 from spacy.tokens import Doc, Token, Span
 from collections import defaultdict
-from hw3utils import PRF1
+from utils import PRF1
 from spacy.language import Language
 from pymagnitude import Magnitude
 from collections import Counter
@@ -86,7 +86,7 @@ class PunctuationFeature(FeatureExtractor):
         tokens: Sequence[str],
         features: Dict[str, float],
     ) -> None:
-        if hw3utils.PUNC_REPEAT_RE.match(token):
+        if utils.PUNC_REPEAT_RE.match(token):
             features["punc[%d]" % relative_idx] = 1.0
 
 
@@ -99,7 +99,7 @@ class DigitFeature(FeatureExtractor):
         tokens: Sequence[str],
         features: Dict[str, float],
     ) -> None:
-        if hw3utils.DIGIT_RE.search(token):
+        if utils.DIGIT_RE.search(token):
             features["digit[%d]" % relative_idx] = 1.0
 
 class WordShapeFeature(FeatureExtractor):
@@ -112,9 +112,9 @@ class WordShapeFeature(FeatureExtractor):
         features: Dict[str, float],
     ) -> None:
         shape = token
-        shape = hw3utils.UPPERCASE_RE.sub("X", shape)
-        shape = hw3utils.LOWERCASE_RE.sub("x", shape)
-        shape = hw3utils.DIGIT_RE.sub("0", shape)
+        shape = utils.UPPERCASE_RE.sub("X", shape)
+        shape = utils.LOWERCASE_RE.sub("x", shape)
+        shape = utils.DIGIT_RE.sub("0", shape)
         features["shape[%d]=%s" % (relative_idx, shape)] = 1.0
 
 class LengthFeature(FeatureExtractor):
@@ -163,9 +163,6 @@ class WindowedTokenFeatureExtractor:
                 # i + j: absolute index of the focus token in tokens
                 if i + j >= 0 and i + j < len(tokens):
                     for extractor in self.feature_extractors:
-                        # if type(extractor) == BiasFeature:
-                        #     extractor.extract(tok, i, 0, tokens, features)
-                        # else:
                         extractor.extract(tokens[i+j], i, j, tokens, features)
             dict_list.append(features)
         #print(dict_list)
@@ -401,17 +398,6 @@ def span_scoring_counts(
                 ScoringEntity(tuple(w.text for w in e), e.label_)
                 for e in false_pos_set
             ])
-
-            # for j in len(test_ents):
-            #     test_ent = test_ents[j]
-            #     flag = 0
-            #
-            #     for k in len(ref_ents):
-            #         ref_ent = ref_ents[k]
-            #         if ref_ent.start == test_ent.start and \
-            #                 ref_ent.end == test_ent.end and ref_ent.label_ == test_ent.label_:
-            #             flag = 1
-            #     if
     else:
         for i in range(len(reference_docs)):
             ref_ents = reference_docs[i].ents
@@ -447,18 +433,6 @@ def ingest_json_document(doc_json: Mapping, nlp: Language) -> Doc:
     doc = nlp(doc_json["text"])
     entities = []
 
-    # tok_lst = doc_json["text"].split()
-    #print(tok_lst)
-    #tok_dict = {}
-    # count = 0
-    # for i,tok in enumerate(tok_lst):
-    #     tok_dict[i] = count
-    #     count += len(tok)+1
-    #print(tok_dict)
-
-    #for t in doc:
-    #   tok_dict[t.i] = (t.idx, t.idx+len(t.text))
-
     start_lst = [t.idx for t in doc]
     end_lst = [t.idx + len(t.text) for t in doc]
 
@@ -489,37 +463,6 @@ def ingest_json_document(doc_json: Mapping, nlp: Language) -> Doc:
 
         entities.append(Span(doc, start, end, label[2]))
 
-        #start = 0
-        #end = 0
-        # start_find = False
-        # end_find = False
-        # for key, value in tok_dict.items():
-        #     #print(key,value)
-        #     if not start_find and label[0] <= value:
-        #         start = key-1 if label[0] < value else key
-        #         start_find = True
-        #         #print(start)
-        #     if not end_find and label[1] <= value:
-        #         end = key if label[1] < value else (key+1)
-        #         end_find = True
-        #         #print(end)
-        #     if not start_find and label[0] > tok_dict[len(doc)-1]:
-        #         start = len(doc)-1
-        #         start_find = True
-        #         #print(start)
-        #     if not end_find and label[1] > tok_dict[len(doc)-1]:
-        #         end = len(doc)
-        #         end_find = True
-        #         #print(end)
-        #     if start_find and end_find:
-        #         if start < prev_end:
-        #             start += 1
-        #         prev_end = end
-        #         entities.append(Span(doc, start, end, label[2]))
-        #         break
-        #print(start, end, label[2])
-
-    #print(entities)
     doc.ents = entities
 
     return doc
@@ -567,8 +510,6 @@ def span_prf1_type_map(
     type_set = set().union(set(rec_denomi.keys()), set(pre_denomi.keys()))
 
     for k in type_set:
-        #print(pre_denomi[k], rec_denomi[k])
-        #print(true_pos[k])
         precison = true_pos[k] / pre_denomi[k] if k in pre_denomi else 0
         recall = true_pos[k] / rec_denomi[k] if k in rec_denomi else 0
         f1 = 2 * precison * recall / (precison + recall) if precison != 0 and recall != 0 else 0
@@ -586,7 +527,7 @@ def span_prf1_type_map(
 
 def experiment(featureExtractors, encoder, iteration):
     # print("Encoder:", str(type(encoder)).split('.')[-1][:-2],",", "Iteration:", iteration,",", "typed:", typed)
-    print([str(type(encoder)) for encoder in featureExtractors])
+    #print([str(type(encoder)) for encoder in featureExtractors])
     nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser", "ner"])
     nlp.add_pipe(nlp.create_pipe('sentencizer'))
 
@@ -613,12 +554,6 @@ def experiment(featureExtractors, encoder, iteration):
             except ValueError:
                 continue
 
-    # for doc in train:
-    #     print(doc.ents)
-
-    #for e in train[0].ents:
-    #    print(e.text, e.label_)
-
     # Delete annotation on valid
     for doc in valid:
         doc.ents = []
@@ -633,9 +568,7 @@ def experiment(featureExtractors, encoder, iteration):
     crf.train(train, "ap", {"max_iterations": iteration}, "tmp.model")
     valid = [crf(doc) for doc in valid]
 
-    # for doc in valid:
-    #     print(doc.ents)
-    # Load valid again to eval
+    # Load valid again to evaluate
     valid_gold = []
     with open('batch_9_meiqw.jsonl', 'r') as f:
         lines = f.readlines()
@@ -646,9 +579,6 @@ def experiment(featureExtractors, encoder, iteration):
                 valid_gold.append(ingest_json_document(doc_json, nlp))
             except ValueError:
                 continue
-
-    # for doc in valid_gold:
-    #     print(doc.ents)
 
     print("Type\tPrec\tRec\tF1", file=sys.stderr)
     # Always round .5 up, not towards even numbers as is the default
@@ -678,12 +608,12 @@ def main() -> None:
                    BrownClusterFeature("restaurant_reviews_all_truecase_paths", use_prefixes=True,
                                        prefixes=[8, 12, 16, 20])]
     experiment(extractor_2, BILOUEncoder(), 40)
-    
+
     extractor_3 = [BiasFeature(), TokenFeature(), UppercaseFeature(), TitlecaseFeature(), InitialTitlecaseFeature(), \
                    DigitFeature(), WordShapeFeature(),
                    WordVectorFeature("restaurant_reviews_all_truecase.magnitude", 0.5)]
     experiment(extractor_3, BILOUEncoder(), 40)
-    
+
     extractor_4 = [BiasFeature(), TokenFeature(), UppercaseFeature(), TitlecaseFeature(), InitialTitlecaseFeature(), \
                    DigitFeature(), WordShapeFeature()]
     experiment(extractor_4, BILOUEncoder(), 40)
