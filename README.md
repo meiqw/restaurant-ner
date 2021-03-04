@@ -1,4 +1,4 @@
-#Yelp Restaurant Review Named Entity Recognition Pipeline Building and Experiments
+# Yelp Restaurant Review Named Entity Recognition Pipeline Building and Experiments
 
 This project is consists of a pipeline building for NER on Yelp restaurant reviews,
 along with some feature ablation experiments.
@@ -46,7 +46,7 @@ python -m spacy download en_core_web_sm
 
 to install the spaCy models required for this assignment
 
-###Contribution
+### Contribution
 
 util_files folder, utils.py and annotation guideline is contributed by Professor
 Constantine Lignos at Brandeis University.
