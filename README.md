@@ -48,5 +48,5 @@ to install the spaCy models required for this assignment
 
 ### Contribution
 
-util_files folder, utils.py and annotation guideline is contributed by Professor
+Util_files folder, utils.py and annotation guideline is contributed by Professor
 Constantine Lignos at Brandeis University.
