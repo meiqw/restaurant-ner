@@ -23,7 +23,7 @@ evaluation of the model on the entity types.
 Changing feature extractors in the main() section of the file will print out
 different feature experiment results.
 
-### Unit test
+### Unit testing
 
 The unit tests is in test.py.
 
