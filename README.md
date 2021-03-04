@@ -23,6 +23,9 @@ evaluation of the model on the entity types.
 Changing feature extractors in the main() section of the file will print out
 different feature experiment results.
 
+Note: running the file requires restaurant_reviews_all_truecase.magnitude; this
+file is too large to be uploaded to github.
+
 ### Unit testing
 
 The unit tests is in test.py.
@@ -30,6 +33,7 @@ The unit tests is in test.py.
 ### Prerequisites
 
 The python packages listed in requirements.txt need to be installed for the program to run.
+Restaurant_reviews_all_truecase.magnitude file is also required, send me an email if needed.
 
 ### Installing
 Use pip to install the dependencies.
